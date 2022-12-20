@@ -41,7 +41,7 @@ def root_pipeline():
         LabelArtifactTileHE("Artifact"),
         LabelWhiteSpaceHE("Background", proportion_threshold = 0.3),
         StainNormalizationHE("normalize", "macenko", optical_density_threshold=0.02),
-        NucleusDetectionHEWs("nuclei_mask", "macenko", optical_density_threshold=0.02, superpixel_region_size = 7, n_iter = 100, min_distance=10)
+        NucleusDetectionHEWs("nuclei_mask", "macenko", optical_density_threshold=0.02, superpixel_region_size = 5, n_iter = 30, min_distance=9)
         # NucleusDetectionHEWsTest("nuclei_contour", "macenko", optical_density_threshold=0.02, superpixel_region_size = 7, n_iter = 100, min_distance=10)
     ])
     return pipeline
@@ -49,11 +49,11 @@ def root_pipeline():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     dm.initialize(local_directory='/var/inputdata/')
-    cluster = LocalCluster()
+    cluster = LocalCluster(n_workers=12, threads_per_worker=1, processes=True, memory_limit="8GB")
     client = Client(cluster)
     size = 512
-    save_location = os.path.join("/var/inputdata/TCGA-14-0789-preprocessed_{size}.h5path")
-    test = load_file("/var/inputdata/TCGA-14-0789-01Z-00-DX6.dcee0120-1d46-4ab2-a6a8-1906b2c7f1c3.svs")
+    save_location = os.path.join("/var/inputdata/py-data/whole-h5/TCGA-14-0789-preprocessed_{size}.h5path")
+    test = load_file("/var/inputdata/WSI-raw/TCGA-02-0003-01Z-00-DX1.6171b175-0972-4e84-9997-2f1ce75f4407.svs")
     test.run(root_pipeline(), distributed = True, client = client, tile_size = size)
     # test.run(root_pipeline(), distributed = False, tile_size = size)
     test.write(save_location)
