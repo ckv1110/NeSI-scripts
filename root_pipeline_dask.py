@@ -19,7 +19,6 @@ import numpy
 import tqdm
 import os
 import dask
-import dask_mpi as dm
 from dask.distributed import Client, LocalCluster
 import distributed
 # dask.config.set({"distributed.comm.timeouts.tcp": "180s"})
@@ -48,8 +47,15 @@ def root_pipeline():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    dm.initialize(local_directory='/var/inputdata/')
-    cluster = LocalCluster(n_workers=12, threads_per_worker=1, processes=True, memory_limit="8GB")
+    # loading number of workers and memory limits from the slurm environment
+    n_workers = int(os.environ["SLURM_CPUS_PER_TASK"])
+    total_mem_bytes = int(os.environ["SLURM_MEM_PER_NODE"]) * 1024 * 1024  # SLURM_MEM_PER_NODE is in MB
+    mem_limit_bytes = total_mem_bytes // n_workers
+    print(f"n_workers: {n_workers}")
+    print(f"total memory: {total_mem_bytes / 1024 / 1024} MB")
+    print(f"mem limit per worker: {mem_limit_bytes / 1024 / 1024:.0f} MB")
+
+    cluster = LocalCluster(n_workers=n_workers, threads_per_worker=1, processes=True, memory_limit=mem_limit_bytes)
     client = Client(cluster)
     size = 512
     save_location = os.path.join("/var/inputdata/py-data/whole-h5/TCGA-14-0789-preprocessed_{size}.h5path")
