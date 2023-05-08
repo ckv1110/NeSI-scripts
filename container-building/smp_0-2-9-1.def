@@ -1,0 +1,75 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Version v0.2.9.1
+    Installation of PathML with CV edits 
+	Uses base Ubuntu 22.04 image
+
+%environment
+	export LC_ALL=C
+    export LC_NUMERIC=en_GB.UTF-8
+	export PATH="/opt/miniconda3/bin:$PATH"
+    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"
+	
+%files
+    pathml-0.2.1 /opt
+
+%post
+	apt-get update && apt-get install -y --no-install-recommends \
+	openslide-tools \
+	clinfo \
+	ocl-icd-opencl-dev \
+	ocl-icd-libopencl1 \
+	opencl-headers \
+	pocl-opencl-icd \
+    g++ \
+    gcc  \
+    libpixman-1-0 \
+    libblas-dev \
+    liblapack-dev \
+    wget \
+    openjdk-8-jre \
+    openjdk-8-jdk \
+	apt-utils \
+	git \
+	software-properties-common 
+	
+	mkdir ~/TMP
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh 
+	TMPDIR=~/TMP bash Miniconda3-py38_4.10.3-Linux-x86_64.sh -bfp /opt/miniconda3/ 
+	rm -f Miniconda3-py38_4.10.3-Linux-x86_64.sh 
+	rm -rf /var/lib/apt/lists/* 
+	mkdir /var/inputdata 
+	mkdir /var/outputdata
+	
+	export PATH="/opt/miniconda3/bin:$PATH" 
+	echo 'export PATH="/opt/miniconda3/bin:$PATH"' >> SINGULARITY_ENVIRONMENT
+	echo 'export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"' >> SINGULARITY_ENVIRONMENT 
+	export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"
+	
+	conda install -y -c anaconda cudatoolkit=11.0 
+	conda install -y -c intel mpi4py 
+	conda install -y -c conda-forge dask-mpi
+	conda install -c conda-forge pocl 
+	conda install -c conda-forge ocl-icd-system 
+	conda install -c conda-forge pyopencl 
+	conda install -c conda-forge pyclesperanto-prototype 
+	
+	pip3 install pip==21.3.1 
+	pip3 install numpy==1.19.5 spams==2.6.2.5 imutils 
+	pip3 install python-bioformats==4.0.0 scipy scikit-image matplotlib Cython imgaug ipykernel openslide-python tqdm deepcell pytest 
+	pip3 install /opt/pathml-0.2.1/ 
+	pip3 install git+https://github.com/qubvel/segmentation_models.pytorch 
+	pip3 install -U albumentations 
+	pip3 install fastnumbers 
+	pip3 install bokeh 
+	pip3 install pytorch-lightning 
+	pip3 install jupyter -U && pip3 install jupyterlab && pip3 install ipykernel
+	
+	echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd && \
+	cp /etc/OpenCL/vendors/*.icd /opt/miniconda3/etc/OpenCL/vendors/
+
+%runscript
+    echo "Container was created $NOW"
+	
