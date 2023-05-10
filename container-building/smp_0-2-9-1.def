@@ -36,11 +36,11 @@ From: ubuntu:22.04
 	software-properties-common 
 	
 	mkdir ~/TMP
-	wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh 
-	TMPDIR=~/TMP bash Miniconda3-py38_4.10.3-Linux-x86_64.sh -bfp /opt/miniconda3/ 
-	rm -f Miniconda3-py38_4.10.3-Linux-x86_64.sh 
-	rm -rf /var/lib/apt/lists/* 
-	mkdir /var/inputdata 
+    wget -O miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-py38_23.3.1-0-Linux-x86_64.sh
+	TMPDIR=~/TMP bash miniconda.sh -bfp /opt/miniconda3/
+	rm -f miniconda.sh
+	rm -rf /var/lib/apt/lists/*
+	mkdir /var/inputdata
 	mkdir /var/outputdata
 	
 	export PATH="/opt/miniconda3/bin:$PATH" 
@@ -72,4 +72,3 @@ From: ubuntu:22.04
 
 %runscript
     echo "Container was created $NOW"
-	
