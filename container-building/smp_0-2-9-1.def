@@ -2,7 +2,7 @@ Bootstrap: docker
 From: ubuntu:22.04
 
 %labels
-    Version v0.2.9.1
+    Version v0.3
     Installation of PathML with CV edits 
 	Uses base Ubuntu 22.04 image
 
@@ -53,10 +53,9 @@ From: ubuntu:22.04
 	conda install -y -c conda-forge dask-mpi
 	conda install -c conda-forge pocl 
 	conda install -c conda-forge ocl-icd-system 
-	conda install -c conda-forge pyopencl 
-	conda install -c conda-forge pyclesperanto-prototype 
 	
-	pip3 install pip==21.3.1 
+	pip3 install pip
+	pip3 install pyopencl==2020.1
 	pip3 install numpy==1.19.5 spams==2.6.2.5 imutils 
 	pip3 install python-bioformats==4.0.0 scipy scikit-image matplotlib Cython imgaug ipykernel openslide-python tqdm deepcell pytest 
 	pip3 install /opt/pathml-0.2.1/ 
@@ -64,7 +63,9 @@ From: ubuntu:22.04
 	pip3 install -U albumentations 
 	pip3 install fastnumbers 
 	pip3 install bokeh 
-	pip3 install pytorch-lightning 
+	pip3 install pytorch-lightning==1.9.5
+	pip3 install optuna
+	pip3 install pyclesperanto-prototype
 	pip3 install jupyter -U && pip3 install jupyterlab && pip3 install ipykernel
 	
 	echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd && \

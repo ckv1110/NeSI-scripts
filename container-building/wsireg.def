@@ -1,0 +1,59 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Version v0.6
+    Installation of wsireg, bioformats2raw and raw2ometiff libraries
+	Uses base Ubuntu 20.04 image
+
+%environment
+	export LC_ALL=C
+    export LC_NUMERIC=en_GB.UTF-8
+	export PATH="/opt/miniconda3/bin:$PATH"
+	export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"
+	
+%post
+	apt-get update && apt-get install -y --no-install-recommends \
+    g++ \
+    gcc  \
+	libblosc1 \
+    libpixman-1-0 \
+    libblas-dev \
+    liblapack-dev \
+	apt-utils \
+	git \
+    wget \
+	unzip \
+	gradle \
+	openjdk-8-jre \
+    openjdk-8-jdk \
+	software-properties-common \
+	
+	mkdir ~/TMP
+    wget -O miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-py38_23.3.1-0-Linux-x86_64.sh
+	TMPDIR=~/TMP bash miniconda.sh -bfp /opt/miniconda3/
+	rm -f miniconda.sh
+	rm -rf /var/lib/apt/lists/*
+	mkdir /var/inputdata
+	mkdir /var/outputdata
+	
+	wget -P /opt https://github.com/glencoesoftware/raw2ometiff/releases/download/v0.5.0/raw2ometiff-0.5.0.zip
+	unzip /opt/raw2ometiff-0.5.0.zip
+	rm -f /opt/raw2ometiff-0.5.0.zip
+	rm -f /opt/raw2ometiff-0.5.0/bin/raw2ometiff.bat
+	
+	export PATH="/opt/raw2ometiff-0.5.0/bin:/opt/miniconda3/bin:$PATH" 
+	echo 'export PATH="/opt/raw2ometiff-0.5.0/bin:/opt/miniconda3/bin:$PATH"' >> SINGULARITY_ENVIRONMENT
+	echo 'export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"' >> SINGULARITY_ENVIRONMENT 
+	export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/"
+	
+	conda install -c ome bioformats2raw=0.7.0
+	
+	pip3 install pip
+	pip3 install numpy imutils 
+	pip3 install scipy scikit-image matplotlib Cython imgaug ipykernel tqdm pytest pandas
+	pip3 install wsireg opencv-python-headless ipywidgets
+	pip3 install -U scikit-learn
+	
+%runscript
+    echo "Container was created $NOW"
