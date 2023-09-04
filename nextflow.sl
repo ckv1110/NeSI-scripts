@@ -16,3 +16,4 @@ export SINGULARITY_TMPDIR=/nesi/nobackup/uoa03709/containers/apptainer_tmpdir
 mkdir -p $SINGULARITY_CACHEDIR $SINGULARITY_TMPDIR
 setfacl -b $SINGULARITY_TMPDIR
 
+nextflow run ckv1110/mcmicro --in T71GBM12_001/reg2 -profile singularity
